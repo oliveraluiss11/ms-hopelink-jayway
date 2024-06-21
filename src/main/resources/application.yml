@@ -1,0 +1,9 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: hopelink
+  data:
+    mongodb:
+      uri:  mongodb+srv://oliveraluis11:oliveraluis11@cluster-jayway.8mfmua4.mongodb.net/hopelink-dev?retryWrites=true&w=majority&appName=cluster-jayway
+
