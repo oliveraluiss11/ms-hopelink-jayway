@@ -31,7 +31,7 @@ public class UserController {
     private ResponseEntity<Void> register(@RequestBody RegisterUserDTO request){
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(AlreadyUserExistsException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(AlreadyUserExistsException ex) {
         ErrorResponse errorResponse = buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), ex.getLocalizedMessage());
         return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);

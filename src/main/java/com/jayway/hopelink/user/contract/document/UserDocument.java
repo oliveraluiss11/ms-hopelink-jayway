@@ -16,12 +16,12 @@ public class UserDocument {
     private String userId;
     @Indexed
     private String documentNumber;
+    @Indexed
+    private String phoneNumber;
     private String firstName;
     private String lastName;
-    private String photoUrl;
     @Indexed
     private String email;
-    private LocalDateTime birthDate;
     private LocalDateTime registrationDate;
     private LocalDateTime updatedDate;
 }

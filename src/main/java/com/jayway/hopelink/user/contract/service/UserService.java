@@ -11,7 +11,7 @@ public class UserService implements RegisterUser, FindUser{
     private final UserRepository userRepository;
     @Override
     public void register(RegisterUserDTO request) {
-
-        //userRepository.save(RegisterUserDTO.toDocument(request));
+        request.ensureAttributes();
+        userRepository.save(RegisterUserDTO.toEntity(request));
     }
 }
