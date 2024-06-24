@@ -1,5 +1,7 @@
 package com.jayway.hopelink.user.contract.service;
 
-public interface FindUser {
+import com.jayway.hopelink.user.dto.UserInfo;
 
+public interface FindUser {
+    UserInfo findByDocumentNumber(String email);
 }

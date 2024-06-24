@@ -3,7 +3,9 @@ package com.jayway.hopelink.user.contract.service;
 import com.jayway.hopelink.user.contract.document.UserDocument;
 import com.jayway.hopelink.user.contract.repository.UserRepository;
 import com.jayway.hopelink.user.dto.RegisterUserDTO;
+import com.jayway.hopelink.user.dto.UserInfo;
 import com.jayway.hopelink.user.exception.AlreadyUserExistsException;
+import com.jayway.hopelink.user.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -103,5 +105,34 @@ class UserServiceTest {
         // Act & Assert
         assertThrows(AlreadyUserExistsException.class, () -> userService.register(existingUser));
         verify(userRepository, times(0)).save(any());
+    }
+
+    @Test
+    void findByDocumentNumber_shouldThrowException_whenUserNotFound() {
+        String documentNumber = "12345678";
+
+        when(userRepository.findByDocumentNumber(documentNumber)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.findByDocumentNumber(documentNumber));
+    }
+
+    @Test
+    void findByDocumentNumber_shouldReturnUserInfo_whenUserFound() {
+        String documentNumber = "12345678";
+        var user = new UserDocument();
+        user.setDocumentNumber(documentNumber);
+
+        when(userRepository.findByDocumentNumber(documentNumber)).thenReturn(Optional.of(user));
+
+        UserInfo userInfo = userService.findByDocumentNumber(documentNumber);
+        assertNotNull(userInfo);
+        assertEquals(documentNumber, userInfo.getDocumentNumber());
+    }
+
+    @Test
+    void findByDocumentNumber_shouldThrowIllegalArgumentException_whenDocumentNumberIsInvalid() {
+        String invalidDocumentNumber = "123ABC";
+
+        assertThrows(IllegalArgumentException.class, () -> userService.findByDocumentNumber(invalidDocumentNumber));
     }
 }
