@@ -3,6 +3,7 @@ package com.jayway.hopelink.user.contract.service;
 import com.jayway.hopelink.user.contract.document.UserDocument;
 import com.jayway.hopelink.user.contract.repository.UserRepository;
 import com.jayway.hopelink.user.dto.RegisterUserDTO;
+import com.jayway.hopelink.user.exception.AlreadyUserExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -10,10 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class UserServiceTest {
     @Mock
@@ -38,13 +40,19 @@ class UserServiceTest {
                 "john.doe@gmail.com",
                 "john.doe@gmail.com");
 
+        when(userRepository.findByDocumentNumberOrPhoneNumberOrEmail(
+                validUser.getDocumentNumber(),
+                validUser.getPhoneNumber(),
+                validUser.getEmail()))
+                .thenReturn(Optional.empty());
+
         // Act
         userService.register(validUser);
 
         // Assert
         ArgumentCaptor<UserDocument> userCaptor = ArgumentCaptor.forClass(UserDocument.class);
         verify(userRepository, times(1)).save(userCaptor.capture());
-        var savedUser = userCaptor.getValue();
+        UserDocument savedUser = userCaptor.getValue();
 
         assertNotNull(savedUser);
         assertEquals(validUser.getDocumentNumber(), savedUser.getDocumentNumber());
@@ -67,6 +75,33 @@ class UserServiceTest {
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> userService.register(invalidUser));
+        verify(userRepository, times(0)).save(any());
+    }
+
+    @Test
+    void testRegisterUserAlreadyExists() {
+        // Arrange
+        RegisterUserDTO existingUser = new RegisterUserDTO(
+                "12345678",
+                "912345678",
+                "John",
+                "Doe",
+                "john.doe@gmail.com",
+                "john.doe@gmail.com");
+
+        var user = new UserDocument();
+        user.setDocumentNumber(existingUser.getDocumentNumber());
+        user.setPhoneNumber(existingUser.getPhoneNumber());
+        user.setEmail(existingUser.getEmail());
+
+        when(userRepository.findByDocumentNumberOrPhoneNumberOrEmail(
+                existingUser.getDocumentNumber(),
+                existingUser.getPhoneNumber(),
+                existingUser.getEmail()))
+                .thenReturn(Optional.of(user));
+
+        // Act & Assert
+        assertThrows(AlreadyUserExistsException.class, () -> userService.register(existingUser));
         verify(userRepository, times(0)).save(any());
     }
 }
