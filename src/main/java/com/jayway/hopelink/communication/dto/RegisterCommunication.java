@@ -9,4 +9,5 @@ public class RegisterCommunication {
     private String documentNumber;
     private String message;
     private String mediaUrl;
+    private SendCommunication sendCommunication;
 }
