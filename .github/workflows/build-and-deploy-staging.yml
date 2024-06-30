@@ -27,8 +27,8 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t hopelink .
-          docker tag hopelink ${{ secrets.DOCKER_USERNAME }}/hopelink:stag
-          docker push ${{ secrets.DOCKER_USERNAME }}/hopelink:stag
+          docker tag hopelink ${{ secrets.DOCKER_USERNAME }}/hopelink:stage
+          docker push ${{ secrets.DOCKER_USERNAME }}/hopelink:stage
 
   deploy:
     runs-on: ubuntu-latest
