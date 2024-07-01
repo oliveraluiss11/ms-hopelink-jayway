@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   pull_request:
     branches:
-      - production
+      - staging
 
 jobs:
   build:
@@ -27,14 +27,14 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t hopelink .
-          docker tag hopelink ${{ secrets.DOCKER_USERNAME }}/hopelink:prod
-          docker push ${{ secrets.DOCKER_USERNAME }}/hopelink:prod
+          docker tag hopelink ${{ secrets.DOCKER_USERNAME }}/hopelink:stage
+          docker push ${{ secrets.DOCKER_USERNAME }}/hopelink:stage
 
   deploy:
     runs-on: ubuntu-latest
     needs: [build]
     steps:
-      - name: Deploy to production
+      - name: Deploy to staging
         uses: johnbeynon/render-deploy-action@v0.0.8
         with:
           service-id: ${{ secrets.MY_RENDER_SERVICE_ID }}
