@@ -3,7 +3,10 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - enviroment_config
+      - environment_config
+
+permissions:
+  contents: write
 
 jobs:
   build:
