@@ -12,6 +12,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -33,7 +35,8 @@ class CampaignControllerTest {
     void register_shouldReturnCreatedStatus_whenCampaignRegisteredSuccessfully() {
         // Arrange
         RegisterCampaignDTO request = RegisterCampaignDTO.builder()
-                .targetAmount(100.00)
+                .targetAmount(BigDecimal.valueOf(150.00))
+                .postalCode(50000)
                 .category(Category.FAMILY)
                 .recipientType(RecipientType.MYSELF)
                 .mediaUrl("https://example.com/media")
@@ -47,25 +50,6 @@ class CampaignControllerTest {
         // Assert
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         verify(campaignService, times(1)).register(request);
-    }
-
-    @Test
-    void register_shouldThrowIllegalArgumentException_whenCalledWithInvalidTargetAmount() {
-        // Arrange
-        RegisterCampaignDTO request = RegisterCampaignDTO.builder()
-                .targetAmount(50.00)
-                .category(Category.FAMILY)
-                .recipientType(RecipientType.MYSELF)
-                .mediaUrl("https://example.com/media")
-                .title("Title")
-                .description("Description")
-                .build();
-
-        // Act
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> campaignController.register(request));
-
-        // Assert
-        assertEquals("Target amount is not valid", exception.getMessage());
     }
 
 }

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -22,8 +23,8 @@ public class RegisterCampaignDTO {
 //    private String title;
 //    private String description;
 
-    private String campaignId;
-    private Double targetAmount;
+    //    private String campaignId;
+    private BigDecimal targetAmount;
     private Integer postalCode;
     private Category category;
     private RecipientType recipientType;
@@ -41,41 +42,43 @@ public class RegisterCampaignDTO {
         ensureDescriptionIsValid(this.description);
     }
 
-    private void ensureTargetAmountIsValid(Double value) {
+    // mayor a 100
+    private void ensureTargetAmountIsValid(BigDecimal value) {
         Optional.ofNullable(value)
-                .filter(e -> e >= 100)
-                .orElseThrow(() -> new IllegalArgumentException("El monto objetivo debe ser mayor o igual a 100 soles"));
+                .filter(e -> e.compareTo(BigDecimal.valueOf(100)) > 0)
+                .orElseThrow(() -> new IllegalArgumentException("El monto objetivo debe ser mayor a 100"));
     }
 
+    // 5 dígitos
     private void ensurePostalCodeIsValid(Integer value) {
-        Optional.ofNullable(value)
-                .filter(e -> e.toString().matches("\\d{5}"))
-                .orElseThrow(() -> new IllegalArgumentException("El código postal debe ser un número de 5 dígitos"));
+        if (value == null || !value.toString().matches("^\\d{5}$")) {
+            throw new IllegalArgumentException("El codigo postal debe ser un numero de 5 digitos");
+        }
     }
 
     private void ensureCategoryIsValid(Category value) {
         Optional.ofNullable(value)
                 .filter(e -> Arrays.stream(Category.values()).anyMatch(e::equals))
-                .orElseThrow(() -> new IllegalArgumentException("La categoría no es válida"));
+                .orElseThrow(() -> new IllegalArgumentException("La categoría no es valida"));
     }
 
     private void ensureRecipientTypeIsValid(RecipientType value) {
         Optional.ofNullable(value)
                 .filter(e -> Arrays.stream(RecipientType.values()).anyMatch(e::equals))
-                .orElseThrow(() -> new IllegalArgumentException("El tipo de destinatario no es válido"));
+                .orElseThrow(() -> new IllegalArgumentException("El tipo de destinatario no es valido"));
     }
 
     private void ensureMediaUrlIsValid(String value) {
         Optional.ofNullable(value)
                 .filter(e -> !e.isEmpty())
-                .orElseThrow(() -> new IllegalArgumentException("La URL del medio no puede estar vacía"));
+                .orElseThrow(() -> new IllegalArgumentException("La URL del medio no puede estar vacia"));
         // Aquí agregar la validación para que mediaUrl sea una URL de Firebase Storage
     }
 
     private void ensureTitleIsValid(String value) {
         Optional.ofNullable(value)
                 .filter(e -> !e.isEmpty())
-                .orElseThrow(() -> new IllegalArgumentException("El título no puede estar vacío"));
+                .orElseThrow(() -> new IllegalArgumentException("El titulo no puede estar vacio"));
     }
 
     private void ensureDescriptionIsValid(String value) {
@@ -84,10 +87,9 @@ public class RegisterCampaignDTO {
                 .orElseThrow(() -> new IllegalArgumentException("La descripción no puede estar vacía"));
     }
 
-    public static CampaignDocument toEntity(RegisterCampaignDTO registerCampaignDTO){
+    public static CampaignDocument toEntity(RegisterCampaignDTO registerCampaignDTO) {
         return CampaignDocument
                 .builder()
-                .campaignId(registerCampaignDTO.getCampaignId())
                 .targetAmount(registerCampaignDTO.getTargetAmount())
                 .postalCode(registerCampaignDTO.getPostalCode())
                 .category(registerCampaignDTO.getCategory())
